@@ -2,10 +2,15 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Passenger from "@/models/Passenger";
 import Booking from "@/models/Booking";
+import Flight from "@/models/Flight";
 
 function formatBooking(booking) {
   const passenger = booking.passenger;
   const flight = booking.flight;
+
+  if (!passenger || !flight) {
+    return null;
+  }
 
   return {
     id: booking._id.toString(),
@@ -69,7 +74,7 @@ export async function GET(request) {
       .sort({ createdAt: -1 });
 
     return NextResponse.json({
-      bookings: bookings.map(formatBooking),
+      bookings: bookings.map(formatBooking).filter(Boolean),
     });
   } catch (error) {
     console.error(error);
