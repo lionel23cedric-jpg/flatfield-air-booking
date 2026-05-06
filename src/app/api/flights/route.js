@@ -33,7 +33,8 @@ export async function GET(request) {
     const id = searchParams.get("id");
     const from = searchParams.get("from");
     const to = searchParams.get("to");
-    const date = searchParams.get("date");
+    const startDate = searchParams.get("startDate") || searchParams.get("date");
+    const endDate = searchParams.get("endDate") || startDate;
     const seats = Number(searchParams.get("seats") || 1);
 
     if (id) {
@@ -51,9 +52,15 @@ export async function GET(request) {
       });
     }
 
-    if (!from || !to || !date) {
+    if (!from || !to || !startDate || !endDate) {
       return NextResponse.json(
-        { error: "Please provide from, to, and date." },
+        { error: "Please provide from, to, start date, and end date." },
+        { status: 400 }
+      );
+    }
+    if (from === to) {
+      return NextResponse.json(
+        { error: "Departure and destination airports must be different." },
         { status: 400 }
       );
     }
@@ -73,19 +80,45 @@ export async function GET(request) {
         { status: 400 }
       );
     }
+    const toAirport = airports[to];
 
-    const startOfDay = DateTime.fromISO(date, {
+    if (!toAirport) {
+      return NextResponse.json(
+        { error: "Invalid destination airport." },
+        { status: 400 }
+      );
+    }
+
+    const startOfRange = DateTime.fromISO(startDate, {
       zone: fromAirport.zone,
     }).startOf("day");
 
-    const endOfDay = startOfDay.plus({ days: 1 });
+    const endOfRange = DateTime.fromISO(endDate, {
+      zone: fromAirport.zone,
+    })
+      .startOf("day")
+      .plus({ days: 1 });
+
+    if (!startOfRange.isValid || !endOfRange.isValid) {
+      return NextResponse.json(
+        { error: "Please provide valid dates." },
+        { status: 400 }
+      );
+    }
+
+    if (endOfRange <= startOfRange) {
+      return NextResponse.json(
+        { error: "End date must be on or after start date." },
+        { status: 400 }
+      );
+    }
 
     const flights = await Flight.find({
       fromCode: from,
       toCode: to,
       departureTime: {
-        $gte: startOfDay.toJSDate(),
-        $lt: endOfDay.toJSDate(),
+        $gte: startOfRange.toJSDate(),
+        $lt: endOfRange.toJSDate(),
       },
       $expr: {
         $gte: [{ $subtract: ["$capacity", "$bookedSeats"] }, seats],

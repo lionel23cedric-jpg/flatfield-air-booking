@@ -15,6 +15,24 @@ function formatDateTime(value, zone) {
   }).format(new Date(value));
 }
 
+function LoadingCard({ text }) {
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-100 px-6 py-10">
+      <div className="mx-auto max-w-4xl rounded-3xl bg-white p-8 shadow-xl ring-1 ring-slate-200">
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-10 animate-pulse rounded-2xl bg-blue-100" />
+          <div>
+            <p className="font-semibold text-slate-900">{text}</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Please wait while we prepare your booking details.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
 function BookPageContent() {
   const searchParams = useSearchParams();
 
@@ -89,97 +107,159 @@ function BookPageContent() {
   }
 
   if (loadingFlight) {
-    return (
-      <main className="min-h-screen bg-slate-100 px-6 py-10">
-        <div className="mx-auto max-w-4xl rounded-3xl bg-white p-8 shadow">
-          Loading flight...
-        </div>
-      </main>
-    );
+    return <LoadingCard text="Loading flight..." />;
   }
 
   return (
-    <main className="min-h-screen bg-slate-100">
-      <section className="mx-auto max-w-5xl px-6 py-10">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold text-blue-700">
-              Flatfield Air
-            </p>
-            <h1 className="mt-2 text-3xl font-bold text-slate-900">
-              Complete your booking
-            </h1>
-            <p className="mt-2 text-slate-600">
-              Check the flight details and enter passenger information.
-            </p>
-          </div>
-
-          <a
-            href="/flights"
-            className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white"
+    <main className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-100">
+      <section className="mx-auto max-w-6xl px-6 py-10">
+        <div className="mb-8 overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-slate-200">
+          <div
+            className="relative bg-cover bg-center px-6 py-10 md:px-10 md:py-12"
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, rgba(15, 23, 42, 0.92), rgba(30, 64, 175, 0.68)), url('https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=1600&q=80')",
+            }}
           >
-            Back to search
-          </a>
+            <div className="max-w-2xl">
+              <p className="inline-flex rounded-full bg-white/15 px-4 py-1 text-sm font-semibold text-blue-100 ring-1 ring-white/30">
+                Flatfield Air
+              </p>
+
+              <h1 className="mt-5 text-4xl font-bold tracking-tight text-white md:text-5xl">
+                Complete your booking
+              </h1>
+
+              <p className="mt-4 max-w-xl text-base leading-7 text-blue-50">
+                Review your selected flight, enter passenger information, and
+                confirm your booking to receive an invoice.
+              </p>
+            </div>
+
+            <a
+              href="/flights"
+              className="absolute right-6 top-6 rounded-xl bg-white/95 px-4 py-2 text-sm font-semibold text-slate-800 shadow transition hover:bg-white"
+            >
+              Back to search
+            </a>
+          </div>
         </div>
 
         {message && (
-          <div className="mb-6 rounded-2xl bg-red-50 p-4 text-red-700">
+          <div className="mb-6 rounded-2xl border border-red-100 bg-red-50 p-4 text-red-700 shadow-sm">
             {message}
           </div>
         )}
 
         {flight && (
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-3xl bg-white p-6 shadow">
-              <p className="text-sm font-semibold text-blue-700">
-                {flight.flightNumber}
-              </p>
-
-              <h2 className="mt-2 text-2xl font-bold text-slate-900">
-                {flight.fromName} to {flight.toName}
-              </h2>
-
-              <div className="mt-5 space-y-3 text-slate-700">
-                <p>
-                  <span className="font-semibold">Aircraft:</span>{" "}
-                  {flight.aircraft}
+          <div className="grid gap-6 md:grid-cols-[1fr_1fr]">
+            <div className="overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-slate-200">
+              <div className="bg-gradient-to-r from-blue-700 to-sky-600 px-6 py-6 text-white">
+                <p className="text-sm font-semibold text-blue-100">
+                  Selected flight
                 </p>
 
-                <p>
-                  <span className="font-semibold">Depart:</span>{" "}
-                  {formatDateTime(flight.departureTime, flight.departureZone)}
-                </p>
+                <h2 className="mt-2 text-2xl font-bold">
+                  {flight.fromName} to {flight.toName}
+                </h2>
 
-                <p>
-                  <span className="font-semibold">Arrive:</span>{" "}
-                  {formatDateTime(flight.arrivalTime, flight.arrivalZone)}
+                <p className="mt-3 inline-flex rounded-full bg-white/15 px-3 py-1 text-sm font-semibold ring-1 ring-white/25">
+                  {flight.flightNumber}
                 </p>
+              </div>
 
-                <p>
-                  <span className="font-semibold">Available seats:</span>{" "}
-                  {flight.availableSeats}
-                </p>
+              <div className="p-6">
+                <div className="grid gap-4">
+                  <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Aircraft
+                    </p>
+                    <p className="mt-1 font-semibold text-slate-900">
+                      {flight.aircraft}
+                    </p>
+                  </div>
 
-                <p>
-                  <span className="font-semibold">Price per seat:</span>{" "}
-                  {formatMoney(flight.priceCents)}
-                </p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Departure
+                      </p>
+                      <p className="mt-1 font-semibold text-slate-900">
+                        {formatDateTime(
+                          flight.departureTime,
+                          flight.departureZone
+                        )}
+                      </p>
+                    </div>
 
-                <p className="text-xl font-bold text-slate-900">
-                  Total: {formatMoney(flight.priceCents * seats)}
-                </p>
+                    <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Arrival
+                      </p>
+                      <p className="mt-1 font-semibold text-slate-900">
+                        {formatDateTime(
+                          flight.arrivalTime,
+                          flight.arrivalZone
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Available seats
+                      </p>
+                      <p className="mt-1 font-semibold text-slate-900">
+                        {flight.availableSeats}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Price per seat
+                      </p>
+                      <p className="mt-1 font-semibold text-slate-900">
+                        {formatMoney(flight.priceCents)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+                    <p className="text-sm font-semibold text-blue-700">
+                      Booking total
+                    </p>
+                    <p className="mt-1 text-3xl font-bold text-slate-900">
+                      {formatMoney(flight.priceCents * seats)}
+                    </p>
+                    <p className="mt-2 text-sm text-blue-700">
+                      Based on {seats} seat{seats === 1 ? "" : "s"} selected.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
             <form
               onSubmit={handleSubmit}
-              className="rounded-3xl bg-white p-6 shadow"
+              className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200"
             >
-              <h2 className="text-xl font-bold text-slate-900">
-                Passenger details
-              </h2>
+              <div className="mb-6">
+                <p className="text-sm font-semibold text-blue-700">
+                  Passenger information
+                </p>
 
-              <div className="mt-5 grid gap-4">
+                <h2 className="mt-1 text-2xl font-bold text-slate-900">
+                  Passenger details
+                </h2>
+
+                <p className="mt-2 text-sm text-slate-600">
+                  Enter the contact details for this booking. The booking
+                  reference will be shown on the invoice page after confirmation.
+                </p>
+              </div>
+
+              <div className="grid gap-4">
                 <div>
                   <label className="text-sm font-semibold text-slate-700">
                     First name
@@ -187,7 +267,7 @@ function BookPageContent() {
                   <input
                     value={firstName}
                     onChange={(event) => setFirstName(event.target.value)}
-                    className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                     required
                   />
                 </div>
@@ -199,7 +279,7 @@ function BookPageContent() {
                   <input
                     value={lastName}
                     onChange={(event) => setLastName(event.target.value)}
-                    className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                     required
                   />
                 </div>
@@ -212,7 +292,7 @@ function BookPageContent() {
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                     required
                   />
                 </div>
@@ -224,7 +304,7 @@ function BookPageContent() {
                   <input
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
-                    className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                   />
                 </div>
 
@@ -238,14 +318,14 @@ function BookPageContent() {
                     max={flight.availableSeats}
                     value={seats}
                     onChange={(event) => setSeats(Number(event.target.value))}
-                    className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                     required
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="mt-2 rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800"
+                  className="mt-2 rounded-xl bg-gradient-to-r from-blue-700 to-sky-600 px-5 py-3 font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:from-blue-800 hover:to-sky-700 disabled:cursor-not-allowed disabled:opacity-70"
                   disabled={submitting}
                 >
                   {submitting
@@ -260,17 +340,10 @@ function BookPageContent() {
     </main>
   );
 }
+
 export default function BookPage() {
   return (
-    <Suspense
-      fallback={
-        <main className="min-h-screen bg-slate-100 px-6 py-10">
-          <div className="mx-auto max-w-4xl rounded-3xl bg-white p-8 shadow">
-            Loading booking page...
-          </div>
-        </main>
-      }
-    >
+    <Suspense fallback={<LoadingCard text="Loading booking page..." />}>
       <BookPageContent />
     </Suspense>
   );
